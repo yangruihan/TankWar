@@ -2,6 +2,8 @@
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Image;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 
 import javax.swing.JFrame;
 import javax.swing.WindowConstants;
@@ -20,8 +22,8 @@ public class TankClient extends JFrame {
 
 	private int x = 50; // 坦克 x 坐标
 	private int y = 50; // 坦克 y 坐标
-	
-	
+	private int speed = 5; // 坦克速度
+
 	private Image offScreenImage = null; // 缓冲图片
 
 	/*
@@ -42,10 +44,8 @@ public class TankClient extends JFrame {
 
 		// 还原颜色
 		g.setColor(c);
-
-		y += 5;
 	}
-	
+
 	/*
 	 * 覆写 update 方法 实现双缓冲
 	 */
@@ -55,22 +55,22 @@ public class TankClient extends JFrame {
 		if (offScreenImage == null) {
 			offScreenImage = this.createImage(GAME_WIDTH, GAME_HEIGHT);
 		}
-		
+
 		// 获得图片画笔
 		Graphics gOffScreen = offScreenImage.getGraphics();
-		
+
 		// 重绘背景
 		Color c = gOffScreen.getColor();
 		gOffScreen.setColor(GAME_BACKGROUND_COLOR);
 		gOffScreen.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
 		gOffScreen.setColor(c);
-		
+
 		// 绘制图形
 		paint(gOffScreen);
-		
+
 		// 将图片绘制到显示器上
 		g.drawImage(offScreenImage, 0, 0, null);
-		
+
 	}
 
 	/*
@@ -87,6 +87,9 @@ public class TankClient extends JFrame {
 		this.setResizable(false);
 		// 设置窗口是否可见
 		this.setVisible(true);
+		
+		// 添加键盘监听器
+		this.addKeyListener(new KeyMonitor());
 
 		new Thread(new PaintThread()).start();
 	}
@@ -98,6 +101,7 @@ public class TankClient extends JFrame {
 
 	/**
 	 * 绘制线程类
+	 * 
 	 * @author Yrh
 	 *
 	 */
@@ -109,11 +113,53 @@ public class TankClient extends JFrame {
 				// 重绘整个窗口
 				repaint();
 				try {
-					Thread.sleep(100);
+					Thread.sleep(10);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
 			}
 		}
+	}
+
+	/**
+	 * 键盘控制类
+	 * 
+	 * @author Yrh
+	 *
+	 */
+	private class KeyMonitor extends KeyAdapter {
+
+		@Override
+		public void keyPressed(KeyEvent e) {
+			int key = e.getKeyCode();
+			switch (key) {
+			// 点击左键或者A键
+			case KeyEvent.VK_A:
+			case KeyEvent.VK_LEFT:
+				x -= speed;
+				break;
+				
+			// 点击右键或者D键
+			case KeyEvent.VK_D:
+			case KeyEvent.VK_RIGHT:
+				x += speed;
+				break;
+				
+			// 点击上键或者W键
+			case KeyEvent.VK_W:
+			case KeyEvent.VK_UP:
+				y -= speed;
+				break;
+				
+			// 点击下键或者S键
+			case KeyEvent.VK_S:
+			case KeyEvent.VK_DOWN:
+				y += speed;
+				break;
+			default:
+				break;
+			}
+		}
+
 	}
 }

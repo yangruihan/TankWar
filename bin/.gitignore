@@ -1,2 +1,4 @@
 /TankClient.class
 /TankClient$PaintThread.class
+/TankClient$PaintThread$KeyMonitor.class
+/TankClient$KeyMonitor.class
