@@ -8,6 +8,8 @@ import java.awt.event.KeyEvent;
 import javax.swing.JFrame;
 import javax.swing.WindowConstants;
 
+import com.yrh.entity.Tank;
+
 /**
  * 坦克大战客户端
  * 
@@ -20,11 +22,9 @@ public class TankClient extends JFrame {
 	public static final int GAME_HEIGHT = 600; // 窗口高度
 	public static final Color GAME_BACKGROUND_COLOR = Color.GREEN; // 窗口背景颜色
 
-	private int x = 50; // 坦克 x 坐标
-	private int y = 50; // 坦克 y 坐标
-	private int speed = 5; // 坦克速度
-
 	private Image offScreenImage = null; // 缓冲图片
+	
+	private Tank playerTank = new Tank(); // 实例化一个玩家坦克对象
 
 	/*
 	 * 绘制方法
@@ -38,9 +38,8 @@ public class TankClient extends JFrame {
 		g.setColor(GAME_BACKGROUND_COLOR);
 		g.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
 
-		// 设置颜色并画圆
-		g.setColor(Color.RED);
-		g.fillOval(x, y, 30, 30);
+		// 绘制玩家坦克
+		playerTank.draw(g);
 
 		// 还原颜色
 		g.setColor(c);
@@ -131,34 +130,8 @@ public class TankClient extends JFrame {
 
 		@Override
 		public void keyPressed(KeyEvent e) {
-			int key = e.getKeyCode();
-			switch (key) {
-			// 点击左键或者A键
-			case KeyEvent.VK_A:
-			case KeyEvent.VK_LEFT:
-				x -= speed;
-				break;
-				
-			// 点击右键或者D键
-			case KeyEvent.VK_D:
-			case KeyEvent.VK_RIGHT:
-				x += speed;
-				break;
-				
-			// 点击上键或者W键
-			case KeyEvent.VK_W:
-			case KeyEvent.VK_UP:
-				y -= speed;
-				break;
-				
-			// 点击下键或者S键
-			case KeyEvent.VK_S:
-			case KeyEvent.VK_DOWN:
-				y += speed;
-				break;
-			default:
-				break;
-			}
+			// 处理按键事件
+			playerTank.keyPressed(e);
 		}
 
 	}
