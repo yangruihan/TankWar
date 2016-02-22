@@ -34,6 +34,10 @@ public class Tank {
 	private boolean bUp = false;
 	private boolean bDown = false;
 
+	// 用于记录是否可以开火，使开火有一定的间隔
+	private boolean canFire = true;
+	private int fireSpeed = 1; // 开火速度，默认为1
+
 	// 用数组记录Tank发出的子弹
 	private ArrayList<Missile> missileList = new ArrayList<>();
 
@@ -126,7 +130,7 @@ public class Tank {
 				missile.draw(g);
 			}
 		}
-		
+
 		// 清除子弹
 		for (Missile missile : willDestoryMissileList) {
 			missileList.remove(missile);
@@ -243,7 +247,7 @@ public class Tank {
 		// 点击空格键发射炮弹
 		case KeyEvent.VK_SPACE:
 			// 创建子弹
-			createMissile();
+			fire();
 			break;
 
 		// 点击左键或者A键
@@ -279,10 +283,14 @@ public class Tank {
 	/**
 	 * 创建一颗子弹
 	 */
-	private void createMissile() {
-		Missile missile = new Missile(x + TANK_WIDTH / 2 - Missile.MISSILE_WIDTH / 2,
-				y + TANK_WIDTH / 2 - Missile.MISSILE_HEIGHT / 2, gunBarrelDirection);
-		missileList.add(missile);
+	private void fire() {
+		if (canFire) {
+			Missile missile = new Missile(x + TANK_WIDTH / 2 - Missile.MISSILE_WIDTH / 2,
+					y + TANK_WIDTH / 2 - Missile.MISSILE_HEIGHT / 2, gunBarrelDirection);
+			missileList.add(missile);
+			// 创建一个设置开火间隔的进程
+			new Thread(new FireThread()).start();
+		}
 	}
 
 	/**
@@ -311,6 +319,27 @@ public class Tank {
 
 		if (this.direction != Direction.STOP) {
 			this.gunBarrelDirection = this.direction;
+		}
+	}
+
+	/**
+	 * 用于为开火设置间隔的线程
+	 * 
+	 * @author Yrh
+	 *
+	 */
+	class FireThread implements Runnable {
+
+		@Override
+		public void run() {
+			canFire = false;
+			int sleepTime = fireSpeed * 1000;
+			try {
+				Thread.sleep(sleepTime);
+				canFire = true;
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
