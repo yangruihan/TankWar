@@ -24,7 +24,7 @@ public class Tank {
 	private int ySpeed; // 坦克y轴速度
 	
 	private Direction direction; // 坦克行走方向
-	private Direction oldDirection; // 用来记录坦克之前的行走方向
+	private Direction gunBarrelDirection = Direction.RIGHT; // 用来记录坦克炮筒的方向，默认为向右
 	
 	// 用四个boolean值记录用户按键
 	private boolean bLeft = false;
@@ -94,12 +94,44 @@ public class Tank {
 		// 还原颜色
 		g.setColor(c);
 		
+		// 绘制炮筒
+		drawGunBarrel(g);
+		
 		// 绘制所有子弹
 		for (Missile missile: missileList) {
 			missile.draw(g);
 		}
 	}
 	
+	/**
+	 * 绘制炮筒
+	 * @param g 画笔
+	 */
+	private void drawGunBarrel(Graphics g) {
+		Color c = g.getColor();
+		
+		g.setColor(Color.BLACK);
+		if (this.gunBarrelDirection == Direction.LEFT) {
+			g.drawLine(x + TANK_WIDTH / 2, y + TANK_HEIGHT / 2, x, y + TANK_HEIGHT / 2);
+		} else if (this.gunBarrelDirection == Direction.LEFT_UP) {
+			g.drawLine(x + TANK_WIDTH / 2, y + TANK_HEIGHT / 2, x, y);
+		} else if (this.gunBarrelDirection == Direction.UP) {
+			g.drawLine(x + TANK_WIDTH / 2, y + TANK_HEIGHT / 2, x + TANK_WIDTH / 2, y);
+		} else if (this.gunBarrelDirection == Direction.RIGHT_UP) {
+			g.drawLine(x + TANK_WIDTH / 2, y + TANK_HEIGHT / 2, x + TANK_WIDTH, y);
+		} else if (this.gunBarrelDirection == Direction.RIGHT) {
+			g.drawLine(x + TANK_WIDTH / 2, y + TANK_HEIGHT / 2, x + TANK_WIDTH, y + TANK_HEIGHT / 2);
+		} else if (this.gunBarrelDirection == Direction.RIGHT_DOWN) {
+			g.drawLine(x + TANK_WIDTH / 2, y + TANK_HEIGHT / 2, x + TANK_WIDTH, y + TANK_HEIGHT);
+		} else if (this.gunBarrelDirection == Direction.DOWN) {
+			g.drawLine(x + TANK_WIDTH / 2, y + TANK_HEIGHT / 2, x + TANK_WIDTH / 2, y + TANK_HEIGHT);
+		} else if (this.gunBarrelDirection == Direction.LEFT_DOWN) {
+			g.drawLine(x + TANK_WIDTH / 2, y + TANK_HEIGHT / 2, x, y + TANK_HEIGHT);
+		}
+		
+		g.setColor(c);
+	}
+
 	/**
 	 * 根据方向移动坦克
 	 */
@@ -213,7 +245,7 @@ public class Tank {
 	private void createMissile() {
 		Missile missile = new Missile(x + TANK_WIDTH / 2 - Missile.MISSILE_WIDTH / 2,
 									  y + TANK_WIDTH / 2 - Missile.MISSILE_HEIGHT / 2,
-									  oldDirection);
+									  gunBarrelDirection);
 		missileList.add(missile);
 	}
 
@@ -242,7 +274,7 @@ public class Tank {
 		}
 		
 		if (this.direction != Direction.STOP) {
-			oldDirection = direction;
+			this.gunBarrelDirection = this.direction;
 		}
 	}
 	
