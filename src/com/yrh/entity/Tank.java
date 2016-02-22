@@ -3,6 +3,9 @@ package com.yrh.entity;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
+
+import com.yrh.constants.Direction;
 
 /**
  * 坦克实体类
@@ -11,10 +14,8 @@ import java.awt.event.KeyEvent;
  */
 public class Tank {
 	
-	public static final int DEFAULT_SPEED = 1;
-	
-	// 定义Tank的八个方向
-	public enum Direction {LEFT, LEFT_UP, UP, RIGHT_UP, RIGHT, RIGHT_DOWN, DOWN, LEFT_DOWN, STOP};
+	public static final int DEFAULT_SPEED = 1; // 坦克默认速度
+	public static final int TANK_WIDTH = 30;  // 坦克默认宽度
 	
 	private int x; // 坦克 x 坐标
 	private int y; // 坦克 y 坐标
@@ -28,6 +29,9 @@ public class Tank {
 	private boolean bRight = false;
 	private boolean bUp = false;
 	private boolean bDown = false;
+	
+	// 用数组记录Tank发出的子弹
+	private ArrayList<Missile> missileList = new ArrayList<>(); 
 	
 	/**
 	 * 默认构造方法
@@ -84,9 +88,14 @@ public class Tank {
 		Color c = g.getColor();
 		// 设置颜色并画圆
 		g.setColor(Color.RED);
-		g.fillOval(x, y, 30, 30);
+		g.fillOval(x, y, TANK_WIDTH, TANK_WIDTH);
 		// 还原颜色
 		g.setColor(c);
+		
+		// 绘制所有子弹
+		for (Missile missile: missileList) {
+			missile.draw(g);
+		}
 	}
 	
 	/**
@@ -160,6 +169,12 @@ public class Tank {
 	public void keyPressed(KeyEvent e) {
 		int key = e.getKeyCode();
 		switch (key) {
+		// 点击空格键发射炮弹
+		case KeyEvent.VK_SPACE:
+			// 创建子弹
+			createMissile();
+			break;
+			
 		// 点击左键或者A键
 		case KeyEvent.VK_A:
 		case KeyEvent.VK_LEFT:
@@ -190,6 +205,14 @@ public class Tank {
 		setDirection();
 	}
 	
+	/**
+	 * 创建一颗子弹
+	 */
+	private void createMissile() {
+		Missile missile = new Missile(x, y, direction);
+		missileList.add(missile);
+	}
+
 	/**
 	 * 根据按键设置方向
 	 */

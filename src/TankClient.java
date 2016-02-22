@@ -140,7 +140,5 @@ public class TankClient extends JFrame {
 			// 处理按键释放事件
 			playerTank.keyReleased(e);
 		}
-
-		
 	}
 }
