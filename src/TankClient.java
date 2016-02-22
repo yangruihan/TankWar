@@ -1,6 +1,7 @@
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Image;
 
 import javax.swing.JFrame;
 import javax.swing.WindowConstants;
@@ -15,9 +16,13 @@ public class TankClient extends JFrame {
 
 	private static int WIDTH = 800; // 窗口宽度
 	private static int HEIGHT = 600; // 窗口高度
+	private static Color BACKGROUND_COLOR = Color.GREEN; // 窗口背景颜色
 
 	private int x = 50; // 坦克 x 坐标
 	private int y = 50; // 坦克 y 坐标
+	
+	
+	private Image offScreenImage = null; // 缓冲图片
 
 	/*
 	 * 绘制方法
@@ -28,7 +33,7 @@ public class TankClient extends JFrame {
 		Color c = g.getColor();
 
 		// 设置颜色并绘制背景
-		g.setColor(Color.GREEN);
+		g.setColor(BACKGROUND_COLOR);
 		g.fillRect(0, 0, WIDTH, HEIGHT);
 
 		// 设置颜色并画圆
@@ -39,6 +44,33 @@ public class TankClient extends JFrame {
 		g.setColor(c);
 
 		y += 5;
+	}
+	
+	/*
+	 * 覆写 update 方法 实现双缓冲
+	 */
+	@Override
+	public void update(Graphics g) {
+		// 判断缓冲图片是否存在
+		if (offScreenImage == null) {
+			offScreenImage = this.createImage(WIDTH, HEIGHT);
+		}
+		
+		// 获得图片画笔
+		Graphics gOffScreen = offScreenImage.getGraphics();
+		
+		// 重绘背景
+		Color c = gOffScreen.getColor();
+		gOffScreen.setColor(BACKGROUND_COLOR);
+		gOffScreen.fillRect(0, 0, WIDTH, HEIGHT);
+		gOffScreen.setColor(c);
+		
+		// 绘制图形
+		paint(gOffScreen);
+		
+		// 将图片绘制到显示器上
+		g.drawImage(offScreenImage, 0, 0, null);
+		
 	}
 
 	/*
