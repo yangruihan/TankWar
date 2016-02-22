@@ -14,9 +14,9 @@ import javax.swing.WindowConstants;
  */
 public class TankClient extends JFrame {
 
-	private static int WIDTH = 800; // 窗口宽度
-	private static int HEIGHT = 600; // 窗口高度
-	private static Color BACKGROUND_COLOR = Color.GREEN; // 窗口背景颜色
+	public static final int GAME_WIDTH = 800; // 窗口宽度
+	public static final int GAME_HEIGHT = 600; // 窗口高度
+	public static final Color GAME_BACKGROUND_COLOR = Color.GREEN; // 窗口背景颜色
 
 	private int x = 50; // 坦克 x 坐标
 	private int y = 50; // 坦克 y 坐标
@@ -33,8 +33,8 @@ public class TankClient extends JFrame {
 		Color c = g.getColor();
 
 		// 设置颜色并绘制背景
-		g.setColor(BACKGROUND_COLOR);
-		g.fillRect(0, 0, WIDTH, HEIGHT);
+		g.setColor(GAME_BACKGROUND_COLOR);
+		g.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
 
 		// 设置颜色并画圆
 		g.setColor(Color.RED);
@@ -53,7 +53,7 @@ public class TankClient extends JFrame {
 	public void update(Graphics g) {
 		// 判断缓冲图片是否存在
 		if (offScreenImage == null) {
-			offScreenImage = this.createImage(WIDTH, HEIGHT);
+			offScreenImage = this.createImage(GAME_WIDTH, GAME_HEIGHT);
 		}
 		
 		// 获得图片画笔
@@ -61,8 +61,8 @@ public class TankClient extends JFrame {
 		
 		// 重绘背景
 		Color c = gOffScreen.getColor();
-		gOffScreen.setColor(BACKGROUND_COLOR);
-		gOffScreen.fillRect(0, 0, WIDTH, HEIGHT);
+		gOffScreen.setColor(GAME_BACKGROUND_COLOR);
+		gOffScreen.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
 		gOffScreen.setColor(c);
 		
 		// 绘制图形
@@ -78,7 +78,7 @@ public class TankClient extends JFrame {
 	 */
 	public void lanchFrame() {
 		// 设置窗口大小
-		this.setSize(WIDTH, HEIGHT);
+		this.setSize(GAME_WIDTH, GAME_HEIGHT);
 		// 设置标题文字
 		this.setTitle("TankWar");
 		// 设置默认关闭操作
