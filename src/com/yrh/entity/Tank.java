@@ -16,6 +16,7 @@ public class Tank {
 	
 	public static final int DEFAULT_SPEED = 1; // 坦克默认速度
 	public static final int TANK_WIDTH = 30;  // 坦克默认宽度
+	public static final int TANK_HEIGHT = 30;  // 坦克默认高度
 	
 	private int x; // 坦克 x 坐标
 	private int y; // 坦克 y 坐标
@@ -23,6 +24,7 @@ public class Tank {
 	private int ySpeed; // 坦克y轴速度
 	
 	private Direction direction; // 坦克行走方向
+	private Direction oldDirection; // 用来记录坦克之前的行走方向
 	
 	// 用四个boolean值记录用户按键
 	private boolean bLeft = false;
@@ -88,7 +90,7 @@ public class Tank {
 		Color c = g.getColor();
 		// 设置颜色并画圆
 		g.setColor(Color.RED);
-		g.fillOval(x, y, TANK_WIDTH, TANK_WIDTH);
+		g.fillOval(x, y, TANK_WIDTH, TANK_HEIGHT);
 		// 还原颜色
 		g.setColor(c);
 		
@@ -209,7 +211,9 @@ public class Tank {
 	 * 创建一颗子弹
 	 */
 	private void createMissile() {
-		Missile missile = new Missile(x, y, direction);
+		Missile missile = new Missile(x + TANK_WIDTH / 2 - Missile.MISSILE_WIDTH / 2,
+									  y + TANK_WIDTH / 2 - Missile.MISSILE_HEIGHT / 2,
+									  oldDirection);
 		missileList.add(missile);
 	}
 
@@ -235,6 +239,10 @@ public class Tank {
 			this.direction = Direction.DOWN;
 		} else if (bLeft && !bRight && !bUp && bDown) {
 			this.direction = Direction.LEFT_DOWN;
+		}
+		
+		if (this.direction != Direction.STOP) {
+			oldDirection = direction;
 		}
 	}
 	

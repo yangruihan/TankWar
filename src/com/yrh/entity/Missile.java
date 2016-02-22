@@ -14,7 +14,8 @@ import com.yrh.constants.Direction;
 public class Missile {
 	public static final int DEFAULT_SPEED = 5; // 子弹默认速度
 	public static final int MISSILE_WIDTH = 10; // 子弹默认宽度
-
+	public static final int MISSILE_HEIGHT = 10; // 子弹默认高度
+	
 	private int x; // 子弹 x 坐标
 	private int y; // 子弹 y 坐标
 	private int xSpeed; // 子弹x轴速度
@@ -60,7 +61,7 @@ public class Missile {
 		Color c = g.getColor();
 		// 设置颜色并画圆
 		g.setColor(Color.BLACK);
-		g.fillOval(x, y, MISSILE_WIDTH, MISSILE_WIDTH);
+		g.fillOval(x, y, MISSILE_WIDTH, MISSILE_HEIGHT);
 		// 还原颜色
 		g.setColor(c);
 	}
