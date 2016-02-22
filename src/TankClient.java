@@ -21,6 +21,7 @@ public class TankClient extends JFrame {
 	public static final int GAME_WIDTH = 800; // 窗口宽度
 	public static final int GAME_HEIGHT = 600; // 窗口高度
 	public static final Color GAME_BACKGROUND_COLOR = Color.GREEN; // 窗口背景颜色
+	public static final int GAME_FRAME = 17; // 默认60hz
 
 	private Image offScreenImage = null; // 缓冲图片
 	
@@ -112,7 +113,7 @@ public class TankClient extends JFrame {
 				// 重绘整个窗口
 				repaint();
 				try {
-					Thread.sleep(10);
+					Thread.sleep(GAME_FRAME);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
@@ -134,5 +135,12 @@ public class TankClient extends JFrame {
 			playerTank.keyPressed(e);
 		}
 
+		@Override
+		public void keyReleased(KeyEvent e) {
+			// 处理按键释放事件
+			playerTank.keyReleased(e);
+		}
+
+		
 	}
 }
