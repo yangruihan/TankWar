@@ -28,11 +28,12 @@ public class Tank {
 	private Direction direction; // 坦克行走方向
 	private Direction gunBarrelDirection = Direction.RIGHT; // 用来记录坦克炮筒的方向，默认为向右
 
-	// 用四个boolean值记录用户按键
+	// 用五个boolean值记录用户按键
 	private boolean bLeft = false;
 	private boolean bRight = false;
 	private boolean bUp = false;
 	private boolean bDown = false;
+	private boolean bFire = false;
 
 	// 用于记录是否可以开火，使开火有一定的间隔
 	private boolean canFire = true;
@@ -105,9 +106,6 @@ public class Tank {
 	 *            画笔
 	 */
 	public void draw(Graphics g) {
-		// 移动坦克
-		move();
-
 		// 保存当前颜色
 		Color c = g.getColor();
 		// 设置颜色并画圆
@@ -115,28 +113,26 @@ public class Tank {
 		g.fillOval(x, y, TANK_WIDTH, TANK_HEIGHT);
 		// 还原颜色
 		g.setColor(c);
-
+		
 		// 绘制炮筒
 		drawGunBarrel(g);
+		
+		// 发射炮弹
+		if (bFire) {
+			fire();
+		}
 
 		// 绘制所有子弹
-		ArrayList<Missile> willDestoryMissileList = new ArrayList<>();
-		for (Missile missile : missileList) {
-			// 如果子弹已经飞出屏幕，则记录将清除
-			if (missile.getX() < 0 || missile.getX() > TankClient.GAME_WIDTH || missile.getY() < 0
-					|| missile.getY() > TankClient.GAME_HEIGHT) {
-				willDestoryMissileList.add(missile);
+		for (int i = 0; i < missileList.size(); i++) {
+			if (missileList.get(i).isLive() == false) {
+				missileList.remove(i);
 			} else {
-				missile.draw(g);
+				missileList.get(i).draw(g);
 			}
 		}
 
-		// 清除子弹
-		for (Missile missile : willDestoryMissileList) {
-			missileList.remove(missile);
-			missile = null;
-		}
-		willDestoryMissileList.clear();
+		// 移动坦克
+		move();
 	}
 
 	/**
@@ -174,24 +170,25 @@ public class Tank {
 	 * 根据方向移动坦克
 	 */
 	public void move() {
-		if (this.direction == Direction.LEFT) {
+		if (this.direction == Direction.LEFT && x - xSpeed > 0) {
 			x -= xSpeed;
-		} else if (this.direction == Direction.LEFT_UP) {
+		} else if (this.direction == Direction.LEFT_UP && x - xSpeed > 0 && y - ySpeed > Tank.TANK_HEIGHT) {
 			x -= xSpeed;
 			y -= ySpeed;
-		} else if (this.direction == Direction.UP) {
+		} else if (this.direction == Direction.UP && y - ySpeed > Tank.TANK_HEIGHT) {
 			y -= ySpeed;
-		} else if (this.direction == Direction.RIGHT_UP) {
+		} else if (this.direction == Direction.RIGHT_UP && x + xSpeed < TankClient.GAME_WIDTH - Tank.TANK_WIDTH && y - ySpeed > Tank.TANK_HEIGHT) {
 			x += xSpeed;
 			y -= ySpeed;
-		} else if (this.direction == Direction.RIGHT) {
+		} else if (this.direction == Direction.RIGHT && x + xSpeed < TankClient.GAME_WIDTH - Tank.TANK_WIDTH) {
 			x += xSpeed;
-		} else if (this.direction == Direction.RIGHT_DOWN) {
+		} else if (this.direction == Direction.RIGHT_DOWN && x + xSpeed < TankClient.GAME_WIDTH - Tank.TANK_WIDTH
+				&& y + ySpeed < TankClient.GAME_HEIGHT - Tank.TANK_WIDTH) {
 			x += xSpeed;
 			y += ySpeed;
-		} else if (this.direction == Direction.DOWN) {
+		} else if (this.direction == Direction.DOWN && y + ySpeed < TankClient.GAME_HEIGHT - Tank.TANK_HEIGHT) {
 			y += ySpeed;
-		} else if (this.direction == Direction.LEFT_DOWN) {
+		} else if (this.direction == Direction.LEFT_DOWN && x - xSpeed > 0 && y + ySpeed < TankClient.GAME_HEIGHT - Tank.TANK_HEIGHT) {
 			x -= xSpeed;
 			y += ySpeed;
 		}
@@ -205,25 +202,30 @@ public class Tank {
 	public void keyReleased(KeyEvent e) {
 		int key = e.getKeyCode();
 		switch (key) {
-		// 点击左键或者A键
+		// 释放空格键发射炮弹
+		case KeyEvent.VK_SPACE:
+			bFire = false;
+			break;
+
+		// 释放左键或者A键
 		case KeyEvent.VK_A:
 		case KeyEvent.VK_LEFT:
 			bLeft = false;
 			break;
 
-		// 点击右键或者D键
+		// 释放右键或者D键
 		case KeyEvent.VK_D:
 		case KeyEvent.VK_RIGHT:
 			bRight = false;
 			break;
 
-		// 点击上键或者W键
+		// 释放上键或者W键
 		case KeyEvent.VK_W:
 		case KeyEvent.VK_UP:
 			bUp = false;
 			break;
 
-		// 点击下键或者S键
+		// 释放下键或者S键
 		case KeyEvent.VK_S:
 		case KeyEvent.VK_DOWN:
 			bDown = false;
@@ -246,8 +248,7 @@ public class Tank {
 		switch (key) {
 		// 点击空格键发射炮弹
 		case KeyEvent.VK_SPACE:
-			// 创建子弹
-			fire();
+			bFire = true;
 			break;
 
 		// 点击左键或者A键

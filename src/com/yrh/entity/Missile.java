@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 
 import com.yrh.constants.Direction;
+import com.yrh.run.TankClient;
 
 /**
  * 子弹实体类
@@ -21,6 +22,8 @@ public class Missile {
 	private int xSpeed; // 子弹x轴速度
 	private int ySpeed; // 子弹y轴速度
 	private Direction direction; // 子弹运动方向
+	
+	private boolean live = true; // 子弹是否存活
 	
 	/**
 	 * 三个参数构造方法
@@ -54,9 +57,6 @@ public class Missile {
 	 * @param g
 	 */
 	public void draw(Graphics g) {
-		// 移动子弹
-		move();
-		
 		// 保存当前颜色
 		Color c = g.getColor();
 		// 设置颜色并画圆
@@ -64,6 +64,9 @@ public class Missile {
 		g.fillOval(x, y, MISSILE_WIDTH, MISSILE_HEIGHT);
 		// 还原颜色
 		g.setColor(c);
+		
+		// 移动子弹
+		move();
 	}
 
 	/**
@@ -90,6 +93,10 @@ public class Missile {
 		} else if (this.direction == Direction.LEFT_DOWN) {
 			x -= xSpeed;
 			y += ySpeed;
+		}
+		
+		if (x < 0 || x > TankClient.GAME_WIDTH || y < 0 || y > TankClient.GAME_HEIGHT) {
+			live = false;
 		}
 	}
 
@@ -133,5 +140,9 @@ public class Missile {
 
 	public void setDirection(Direction direction) {
 		this.direction = direction;
+	}
+
+	public boolean isLive() {
+		return live;
 	}
 }
