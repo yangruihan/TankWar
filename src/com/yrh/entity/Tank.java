@@ -19,11 +19,14 @@ public class Tank {
 	public static final int DEFAULT_SPEED = 1; // 坦克默认速度
 	public static final int TANK_WIDTH = 30; // 坦克默认宽度
 	public static final int TANK_HEIGHT = 30; // 坦克默认高度
+	public static final Color GOOD_TANK_COLOR = Color.RED; // 我方坦克默认颜色
+	public static final Color ENEMY_TANK_COLOR = Color.BLUE; // 敌方坦克默认颜色
 
 	private int x; // 坦克 x 坐标
 	private int y; // 坦克 y 坐标
 	private int xSpeed; // 坦克x轴速度
 	private int ySpeed; // 坦克y轴速度
+	private boolean good; // 用于区分敌我的值
 
 	private Direction direction; // 坦克行走方向
 	private Direction gunBarrelDirection = Direction.RIGHT; // 用来记录坦克炮筒的方向，默认为向右
@@ -46,7 +49,7 @@ public class Tank {
 	 * 默认构造方法
 	 */
 	public Tank() {
-		this(50, 50, DEFAULT_SPEED, DEFAULT_SPEED);
+		this(50, 50, DEFAULT_SPEED, DEFAULT_SPEED, true);
 	}
 
 	/**
@@ -57,8 +60,8 @@ public class Tank {
 	 * @param y
 	 *            坦克出生的y坐标
 	 */
-	public Tank(int x, int y) {
-		this(x, y, DEFAULT_SPEED, DEFAULT_SPEED);
+	public Tank(int x, int y, boolean good) {
+		this(x, y, DEFAULT_SPEED, DEFAULT_SPEED, good);
 	}
 
 	/**
@@ -73,8 +76,8 @@ public class Tank {
 	 * @param ySpeed
 	 *            坦克出生的x轴速度
 	 */
-	public Tank(int x, int y, int xSpeed, int ySpeed) {
-		this(x, y, xSpeed, ySpeed, Direction.STOP);
+	public Tank(int x, int y, int xSpeed, int ySpeed, boolean good) {
+		this(x, y, xSpeed, ySpeed, Direction.STOP, good);
 	}
 
 	/**
@@ -91,12 +94,13 @@ public class Tank {
 	 * @param direction
 	 *            坦克出生的方向
 	 */
-	public Tank(int x, int y, int xSpeed, int ySpeed, Direction direction) {
+	public Tank(int x, int y, int xSpeed, int ySpeed, Direction direction, boolean good) {
 		this.x = x;
 		this.y = y;
 		this.xSpeed = xSpeed;
 		this.ySpeed = ySpeed;
 		this.direction = direction;
+		this.good = good;
 	}
 
 	/**
@@ -108,15 +112,19 @@ public class Tank {
 	public void draw(Graphics g) {
 		// 保存当前颜色
 		Color c = g.getColor();
-		// 设置颜色并画圆
-		g.setColor(Color.RED);
+		// 根据敌我标记设置颜色并画圆
+		if (good) {
+			g.setColor(GOOD_TANK_COLOR);
+		} else {
+			g.setColor(ENEMY_TANK_COLOR);
+		}
 		g.fillOval(x, y, TANK_WIDTH, TANK_HEIGHT);
 		// 还原颜色
 		g.setColor(c);
-		
+
 		// 绘制炮筒
 		drawGunBarrel(g);
-		
+
 		// 发射炮弹
 		if (bFire) {
 			fire();
@@ -177,7 +185,8 @@ public class Tank {
 			y -= ySpeed;
 		} else if (this.direction == Direction.UP && y - ySpeed > Tank.TANK_HEIGHT) {
 			y -= ySpeed;
-		} else if (this.direction == Direction.RIGHT_UP && x + xSpeed < TankClient.GAME_WIDTH - Tank.TANK_WIDTH && y - ySpeed > Tank.TANK_HEIGHT) {
+		} else if (this.direction == Direction.RIGHT_UP && x + xSpeed < TankClient.GAME_WIDTH - Tank.TANK_WIDTH
+				&& y - ySpeed > Tank.TANK_HEIGHT) {
 			x += xSpeed;
 			y -= ySpeed;
 		} else if (this.direction == Direction.RIGHT && x + xSpeed < TankClient.GAME_WIDTH - Tank.TANK_WIDTH) {
@@ -188,7 +197,8 @@ public class Tank {
 			y += ySpeed;
 		} else if (this.direction == Direction.DOWN && y + ySpeed < TankClient.GAME_HEIGHT - Tank.TANK_HEIGHT) {
 			y += ySpeed;
-		} else if (this.direction == Direction.LEFT_DOWN && x - xSpeed > 0 && y + ySpeed < TankClient.GAME_HEIGHT - Tank.TANK_HEIGHT) {
+		} else if (this.direction == Direction.LEFT_DOWN && x - xSpeed > 0
+				&& y + ySpeed < TankClient.GAME_HEIGHT - Tank.TANK_HEIGHT) {
 			x -= xSpeed;
 			y += ySpeed;
 		}

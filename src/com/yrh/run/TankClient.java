@@ -27,6 +27,7 @@ public class TankClient extends JFrame {
 	private Image offScreenImage = null; // 缓冲图片
 	
 	private Tank playerTank = new Tank(); // 实例化一个玩家坦克对象
+	private Tank enemyTank = new Tank(200, 200, false); // 实例化一个敌方坦克对象
 
 	/*
 	 * 绘制方法
@@ -35,16 +36,15 @@ public class TankClient extends JFrame {
 	public void paint(Graphics g) {
 		// 保存当前颜色
 		Color c = g.getColor();
-
 		// 设置颜色并绘制背景
 		g.setColor(GAME_BACKGROUND_COLOR);
 		g.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+		// 还原颜色
+		g.setColor(c);
 
 		// 绘制玩家坦克
 		playerTank.draw(g);
-
-		// 还原颜色
-		g.setColor(c);
+		enemyTank.draw(g);
 	}
 
 	/*
