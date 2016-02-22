@@ -1,3 +1,4 @@
+package com.yrh.run;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -20,7 +21,7 @@ public class TankClient extends JFrame {
 
 	public static final int GAME_WIDTH = 800; // 窗口宽度
 	public static final int GAME_HEIGHT = 600; // 窗口高度
-	public static final Color GAME_BACKGROUND_COLOR = Color.GREEN; // 窗口背景颜色
+	public static final Color GAME_BACKGROUND_COLOR = Color.WHITE; // 窗口背景颜色
 	public static final int GAME_FRAME = 17; // 默认60hz
 
 	private Image offScreenImage = null; // 缓冲图片

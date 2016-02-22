@@ -6,35 +6,37 @@ import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 
 import com.yrh.constants.Direction;
+import com.yrh.run.TankClient;
 
 /**
  * 坦克实体类
+ * 
  * @author Yrh
  *
  */
 public class Tank {
-	
+
 	public static final int DEFAULT_SPEED = 1; // 坦克默认速度
-	public static final int TANK_WIDTH = 30;  // 坦克默认宽度
-	public static final int TANK_HEIGHT = 30;  // 坦克默认高度
-	
+	public static final int TANK_WIDTH = 30; // 坦克默认宽度
+	public static final int TANK_HEIGHT = 30; // 坦克默认高度
+
 	private int x; // 坦克 x 坐标
 	private int y; // 坦克 y 坐标
 	private int xSpeed; // 坦克x轴速度
 	private int ySpeed; // 坦克y轴速度
-	
+
 	private Direction direction; // 坦克行走方向
 	private Direction gunBarrelDirection = Direction.RIGHT; // 用来记录坦克炮筒的方向，默认为向右
-	
+
 	// 用四个boolean值记录用户按键
 	private boolean bLeft = false;
 	private boolean bRight = false;
 	private boolean bUp = false;
 	private boolean bDown = false;
-	
+
 	// 用数组记录Tank发出的子弹
-	private ArrayList<Missile> missileList = new ArrayList<>(); 
-	
+	private ArrayList<Missile> missileList = new ArrayList<>();
+
 	/**
 	 * 默认构造方法
 	 */
@@ -44,8 +46,11 @@ public class Tank {
 
 	/**
 	 * 带两个参数的构造方法
-	 * @param x 坦克出生的x坐标
-	 * @param y 坦克出生的y坐标
+	 * 
+	 * @param x
+	 *            坦克出生的x坐标
+	 * @param y
+	 *            坦克出生的y坐标
 	 */
 	public Tank(int x, int y) {
 		this(x, y, DEFAULT_SPEED, DEFAULT_SPEED);
@@ -53,22 +58,33 @@ public class Tank {
 
 	/**
 	 * 带四个参数的构造方法
-	 * @param x 坦克出生的x坐标
-	 * @param y 坦克出生的y坐标
-	 * @param xSpeed 坦克出生的x轴速度
-	 * @param ySpeed 坦克出生的x轴速度
+	 * 
+	 * @param x
+	 *            坦克出生的x坐标
+	 * @param y
+	 *            坦克出生的y坐标
+	 * @param xSpeed
+	 *            坦克出生的x轴速度
+	 * @param ySpeed
+	 *            坦克出生的x轴速度
 	 */
 	public Tank(int x, int y, int xSpeed, int ySpeed) {
 		this(x, y, xSpeed, ySpeed, Direction.STOP);
 	}
-	
+
 	/**
 	 * 带四个参数的构造方法
-	 * @param x 坦克出生的x坐标
-	 * @param y 坦克出生的y坐标
-	 * @param xSpeed 坦克出生的x轴速度
-	 * @param ySpeed 坦克出生的x轴速度
-	 * @param direction 坦克出生的方向
+	 * 
+	 * @param x
+	 *            坦克出生的x坐标
+	 * @param y
+	 *            坦克出生的y坐标
+	 * @param xSpeed
+	 *            坦克出生的x轴速度
+	 * @param ySpeed
+	 *            坦克出生的x轴速度
+	 * @param direction
+	 *            坦克出生的方向
 	 */
 	public Tank(int x, int y, int xSpeed, int ySpeed, Direction direction) {
 		this.x = x;
@@ -77,15 +93,17 @@ public class Tank {
 		this.ySpeed = ySpeed;
 		this.direction = direction;
 	}
-	
+
 	/**
 	 * 绘制自身方法
-	 * @param g 画笔
+	 * 
+	 * @param g
+	 *            画笔
 	 */
 	public void draw(Graphics g) {
 		// 移动坦克
 		move();
-		
+
 		// 保存当前颜色
 		Color c = g.getColor();
 		// 设置颜色并画圆
@@ -93,23 +111,39 @@ public class Tank {
 		g.fillOval(x, y, TANK_WIDTH, TANK_HEIGHT);
 		// 还原颜色
 		g.setColor(c);
-		
+
 		// 绘制炮筒
 		drawGunBarrel(g);
-		
+
 		// 绘制所有子弹
-		for (Missile missile: missileList) {
-			missile.draw(g);
+		ArrayList<Missile> willDestoryMissileList = new ArrayList<>();
+		for (Missile missile : missileList) {
+			// 如果子弹已经飞出屏幕，则记录将清除
+			if (missile.getX() < 0 || missile.getX() > TankClient.GAME_WIDTH || missile.getY() < 0
+					|| missile.getY() > TankClient.GAME_HEIGHT) {
+				willDestoryMissileList.add(missile);
+			} else {
+				missile.draw(g);
+			}
 		}
+		
+		// 清除子弹
+		for (Missile missile : willDestoryMissileList) {
+			missileList.remove(missile);
+			missile = null;
+		}
+		willDestoryMissileList.clear();
 	}
-	
+
 	/**
 	 * 绘制炮筒
-	 * @param g 画笔
+	 * 
+	 * @param g
+	 *            画笔
 	 */
 	private void drawGunBarrel(Graphics g) {
 		Color c = g.getColor();
-		
+
 		g.setColor(Color.BLACK);
 		if (this.gunBarrelDirection == Direction.LEFT) {
 			g.drawLine(x + TANK_WIDTH / 2, y + TANK_HEIGHT / 2, x, y + TANK_HEIGHT / 2);
@@ -128,7 +162,7 @@ public class Tank {
 		} else if (this.gunBarrelDirection == Direction.LEFT_DOWN) {
 			g.drawLine(x + TANK_WIDTH / 2, y + TANK_HEIGHT / 2, x, y + TANK_HEIGHT);
 		}
-		
+
 		g.setColor(c);
 	}
 
@@ -158,9 +192,10 @@ public class Tank {
 			y += ySpeed;
 		}
 	}
-	
+
 	/**
 	 * 处理按键释放方法
+	 * 
 	 * @param e
 	 */
 	public void keyReleased(KeyEvent e) {
@@ -171,19 +206,19 @@ public class Tank {
 		case KeyEvent.VK_LEFT:
 			bLeft = false;
 			break;
-			
+
 		// 点击右键或者D键
 		case KeyEvent.VK_D:
 		case KeyEvent.VK_RIGHT:
 			bRight = false;
 			break;
-			
+
 		// 点击上键或者W键
 		case KeyEvent.VK_W:
 		case KeyEvent.VK_UP:
 			bUp = false;
 			break;
-			
+
 		// 点击下键或者S键
 		case KeyEvent.VK_S:
 		case KeyEvent.VK_DOWN:
@@ -195,10 +230,12 @@ public class Tank {
 		// 设置方向
 		setDirection();
 	}
-	
+
 	/**
 	 * 处理按键方法
-	 * @param e 按键事件
+	 * 
+	 * @param e
+	 *            按键事件
 	 */
 	public void keyPressed(KeyEvent e) {
 		int key = e.getKeyCode();
@@ -208,25 +245,25 @@ public class Tank {
 			// 创建子弹
 			createMissile();
 			break;
-			
+
 		// 点击左键或者A键
 		case KeyEvent.VK_A:
 		case KeyEvent.VK_LEFT:
 			bLeft = true;
 			break;
-			
+
 		// 点击右键或者D键
 		case KeyEvent.VK_D:
 		case KeyEvent.VK_RIGHT:
 			bRight = true;
 			break;
-			
+
 		// 点击上键或者W键
 		case KeyEvent.VK_W:
 		case KeyEvent.VK_UP:
 			bUp = true;
 			break;
-			
+
 		// 点击下键或者S键
 		case KeyEvent.VK_S:
 		case KeyEvent.VK_DOWN:
@@ -238,14 +275,13 @@ public class Tank {
 		// 设置方向
 		setDirection();
 	}
-	
+
 	/**
 	 * 创建一颗子弹
 	 */
 	private void createMissile() {
 		Missile missile = new Missile(x + TANK_WIDTH / 2 - Missile.MISSILE_WIDTH / 2,
-									  y + TANK_WIDTH / 2 - Missile.MISSILE_HEIGHT / 2,
-									  gunBarrelDirection);
+				y + TANK_WIDTH / 2 - Missile.MISSILE_HEIGHT / 2, gunBarrelDirection);
 		missileList.add(missile);
 	}
 
@@ -272,12 +308,12 @@ public class Tank {
 		} else if (bLeft && !bRight && !bUp && bDown) {
 			this.direction = Direction.LEFT_DOWN;
 		}
-		
+
 		if (this.direction != Direction.STOP) {
 			this.gunBarrelDirection = this.direction;
 		}
 	}
-	
+
 	/* setter and getter */
 	public int getX() {
 		return x;
