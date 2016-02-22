@@ -5,6 +5,7 @@ import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
 
 import javax.swing.JFrame;
 import javax.swing.WindowConstants;
@@ -22,14 +23,15 @@ public class TankClient extends JFrame {
 	public static final int GAME_WIDTH = 800; // 窗口宽度
 	public static final int GAME_HEIGHT = 600; // 窗口高度
 	public static final Color GAME_BACKGROUND_COLOR = Color.WHITE; // 窗口背景颜色
-	public static final int GAME_FRAME = 17; // 默认60hz
+	public static final int GAME_FRAME = 17; // 默认17(60hz)
 
 	private Image offScreenImage = null; // 缓冲图片
 	
-	private Tank playerTank = new Tank(); // 实例化一个玩家坦克对象
-	private Tank enemyTank = new Tank(200, 200, false); // 实例化一个敌方坦克对象
-
-	/*
+	private Tank playerTank = new Tank(this); // 实例化一个玩家坦克对象
+	
+	private ArrayList<Tank> tankList = new ArrayList<>(); // 坦克数组
+	
+	/**
 	 * 绘制方法
 	 */
 	@Override
@@ -42,12 +44,18 @@ public class TankClient extends JFrame {
 		// 还原颜色
 		g.setColor(c);
 
-		// 绘制玩家坦克
-		playerTank.draw(g);
-		enemyTank.draw(g);
+		// 绘制坦克
+		for (int i = 0; i < tankList.size(); i++) {
+			// 如果坦克已经被击中且屏幕上没有它的子弹了，则将其删除
+			if (tankList.get(i).isLive() == false && tankList.get(i).getMissileList().size() == 0) {
+				tankList.remove(i);
+			} else {
+				tankList.get(i).draw(g);
+			}
+		}
 	}
 
-	/*
+	/**
 	 * 覆写 update 方法 实现双缓冲
 	 */
 	@Override
@@ -71,10 +79,9 @@ public class TankClient extends JFrame {
 
 		// 将图片绘制到显示器上
 		g.drawImage(offScreenImage, 0, 0, null);
-
 	}
 
-	/*
+	/**
 	 * 加载 Frame 方法
 	 */
 	public void lanchFrame() {
@@ -88,6 +95,10 @@ public class TankClient extends JFrame {
 		this.setResizable(false);
 		// 设置窗口是否可见
 		this.setVisible(true);
+		
+		Tank enemyTank = new Tank(200, 200, false, this); // 实例化一个敌方坦克
+		this.tankList.add(enemyTank);
+		this.tankList.add(playerTank);
 		
 		// 添加键盘监听器
 		this.addKeyListener(new KeyMonitor());
@@ -142,4 +153,14 @@ public class TankClient extends JFrame {
 			playerTank.keyReleased(e);
 		}
 	}
+
+	
+	public ArrayList<Tank> getTankList() {
+		return tankList;
+	}
+
+	public void setTankList(ArrayList<Tank> tankList) {
+		this.tankList = tankList;
+	}
+
 }

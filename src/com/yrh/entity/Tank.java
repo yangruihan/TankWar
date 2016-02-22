@@ -3,6 +3,7 @@ package com.yrh.entity;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
+import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 
 import com.yrh.constants.Direction;
@@ -22,11 +23,14 @@ public class Tank {
 	public static final Color GOOD_TANK_COLOR = Color.RED; // 我方坦克默认颜色
 	public static final Color ENEMY_TANK_COLOR = Color.BLUE; // 敌方坦克默认颜色
 
+	private TankClient tc; // 坦克客户端的引用
+
 	private int x; // 坦克 x 坐标
 	private int y; // 坦克 y 坐标
 	private int xSpeed; // 坦克x轴速度
 	private int ySpeed; // 坦克y轴速度
 	private boolean good; // 用于区分敌我的值
+	private boolean live = true; // 坦克是否存活
 
 	private Direction direction; // 坦克行走方向
 	private Direction gunBarrelDirection = Direction.RIGHT; // 用来记录坦克炮筒的方向，默认为向右
@@ -45,62 +49,44 @@ public class Tank {
 	// 用数组记录Tank发出的子弹
 	private ArrayList<Missile> missileList = new ArrayList<>();
 
-	/**
-	 * 默认构造方法
-	 */
-	public Tank() {
-		this(50, 50, DEFAULT_SPEED, DEFAULT_SPEED, true);
+	public Tank(TankClient tc) {
+		this(50, 50, DEFAULT_SPEED, DEFAULT_SPEED, true, tc);
+	}
+
+	public Tank(int x, int y, boolean good, TankClient tc) {
+		this(x, y, DEFAULT_SPEED, DEFAULT_SPEED, good, tc);
+	}
+
+	public Tank(int x, int y, int xSpeed, int ySpeed, boolean good, TankClient tc) {
+		this(x, y, xSpeed, ySpeed, Direction.STOP, good, tc);
 	}
 
 	/**
-	 * 带两个参数的构造方法
+	 * 七个参数的构造方法
 	 * 
 	 * @param x
-	 *            坦克出生的x坐标
+	 *            坦克初始的x坐标
 	 * @param y
-	 *            坦克出生的y坐标
-	 */
-	public Tank(int x, int y, boolean good) {
-		this(x, y, DEFAULT_SPEED, DEFAULT_SPEED, good);
-	}
-
-	/**
-	 * 带四个参数的构造方法
-	 * 
-	 * @param x
-	 *            坦克出生的x坐标
-	 * @param y
-	 *            坦克出生的y坐标
+	 *            坦克初始的y坐标
 	 * @param xSpeed
-	 *            坦克出生的x轴速度
+	 *            坦克初始的x轴速度
 	 * @param ySpeed
-	 *            坦克出生的x轴速度
-	 */
-	public Tank(int x, int y, int xSpeed, int ySpeed, boolean good) {
-		this(x, y, xSpeed, ySpeed, Direction.STOP, good);
-	}
-
-	/**
-	 * 带四个参数的构造方法
-	 * 
-	 * @param x
-	 *            坦克出生的x坐标
-	 * @param y
-	 *            坦克出生的y坐标
-	 * @param xSpeed
-	 *            坦克出生的x轴速度
-	 * @param ySpeed
-	 *            坦克出生的x轴速度
+	 *            坦克初始的y轴速度
 	 * @param direction
-	 *            坦克出生的方向
+	 *            坦克初始的方向
+	 * @param good
+	 *            坦克身份
+	 * @param tc
+	 *            坦克客户端引用
 	 */
-	public Tank(int x, int y, int xSpeed, int ySpeed, Direction direction, boolean good) {
+	public Tank(int x, int y, int xSpeed, int ySpeed, Direction direction, boolean good, TankClient tc) {
 		this.x = x;
 		this.y = y;
 		this.xSpeed = xSpeed;
 		this.ySpeed = ySpeed;
 		this.direction = direction;
 		this.good = good;
+		this.tc = tc;
 	}
 
 	/**
@@ -110,6 +96,32 @@ public class Tank {
 	 *            画笔
 	 */
 	public void draw(Graphics g) {
+		// 绘制所有子弹
+		for (int i = 0; i < missileList.size(); i++) {
+			if (missileList.get(i).isLive() == false) {
+				missileList.remove(i);
+			} else {
+				missileList.get(i).draw(g);
+				// 遍历所有敌方坦克看是否击中
+				for (Tank tank : tc.getTankList()) {
+					// 自己的子弹不能击中自己
+					if (tank != this) {
+						missileList.get(i).hitTank(tank);
+					}
+				}
+			}
+		}
+		
+		// 如果已经没有生命了，直接return
+		if (!live) {
+			return;
+		}
+		
+		// 发射炮弹
+		if (bFire) {
+			fire();
+		}
+
 		// 保存当前颜色
 		Color c = g.getColor();
 		// 根据敌我标记设置颜色并画圆
@@ -124,20 +136,6 @@ public class Tank {
 
 		// 绘制炮筒
 		drawGunBarrel(g);
-
-		// 发射炮弹
-		if (bFire) {
-			fire();
-		}
-
-		// 绘制所有子弹
-		for (int i = 0; i < missileList.size(); i++) {
-			if (missileList.get(i).isLive() == false) {
-				missileList.remove(i);
-			} else {
-				missileList.get(i).draw(g);
-			}
-		}
 
 		// 移动坦克
 		move();
@@ -354,6 +352,15 @@ public class Tank {
 		}
 	}
 
+	/**
+	 * 获得包装在坦克外面的矩形，方便进行碰撞检测
+	 * 
+	 * @return Rectangle2D 包裹坦克外边框的矩形
+	 */
+	public Rectangle2D getRect() {
+		return new Rectangle2D.Float(x, y, TANK_WIDTH, TANK_HEIGHT);
+	}
+
 	/* setter and getter */
 	public int getX() {
 		return x;
@@ -395,4 +402,15 @@ public class Tank {
 		this.direction = direction;
 	}
 
+	public boolean isLive() {
+		return live;
+	}
+
+	public void setLive(boolean live) {
+		this.live = live;
+	}
+
+	public ArrayList<Missile> getMissileList() {
+		return missileList;
+	}
 }

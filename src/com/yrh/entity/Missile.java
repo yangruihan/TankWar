@@ -2,6 +2,7 @@ package com.yrh.entity;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.geom.Rectangle2D;
 
 import com.yrh.constants.Direction;
 import com.yrh.run.TankClient;
@@ -57,6 +58,11 @@ public class Missile {
 	 * @param g
 	 */
 	public void draw(Graphics g) {
+		// 如果已经没有生命了直接return
+		if (!live) {
+			return;
+		}
+		
 		// 保存当前颜色
 		Color c = g.getColor();
 		// 设置颜色并画圆
@@ -98,6 +104,29 @@ public class Missile {
 		if (x < 0 || x > TankClient.GAME_WIDTH || y < 0 || y > TankClient.GAME_HEIGHT) {
 			live = false;
 		}
+	}
+	
+	/**
+	 * 用于检测子弹是否击中坦克
+	 * @param tank 需要检测的坦克
+	 * @return 击中返回 true 没击中返回 false
+	 */
+	public boolean hitTank(Tank tank) {
+		if (tank.isLive() && this.getRect().intersects(tank.getRect())) {
+			// 设置子弹和坦克的死亡
+			this.live = false;
+			tank.setLive(false);
+			return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * 获得包装在子弹外面的矩形，方便进行碰撞检测
+	 * @return Rectangle2D 包裹子弹外边框的矩形
+	 */
+	public Rectangle2D getRect() {
+		return new Rectangle2D.Float(x, y, MISSILE_WIDTH, MISSILE_HEIGHT);
 	}
 
 	
