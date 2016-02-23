@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import javax.swing.JFrame;
 import javax.swing.WindowConstants;
 
+import com.yrh.entity.Explode;
 import com.yrh.entity.Tank;
 
 /**
@@ -28,6 +29,7 @@ public class TankClient extends JFrame {
 	private Image offScreenImage = null; // 缓冲图片
 	
 	private Tank playerTank = new Tank(this); // 实例化一个玩家坦克对象
+	private Explode explode = new Explode(300, 300, this);
 	
 	private ArrayList<Tank> tankList = new ArrayList<>(); // 坦克数组
 	
@@ -53,6 +55,8 @@ public class TankClient extends JFrame {
 				tankList.get(i).draw(g);
 			}
 		}
+		
+		explode.draw(g);
 	}
 
 	/**
