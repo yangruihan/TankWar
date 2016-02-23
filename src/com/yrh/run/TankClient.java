@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import javax.swing.JFrame;
 import javax.swing.WindowConstants;
 
+import com.yrh.entity.Explode;
+import com.yrh.entity.Missile;
 import com.yrh.entity.Tank;
 
 /**
@@ -26,11 +28,13 @@ public class TankClient extends JFrame {
 	public static final int GAME_FRAME = 17; // 默认17(60hz)
 
 	private Image offScreenImage = null; // 缓冲图片
-	
+
 	private Tank playerTank = new Tank(this); // 实例化一个玩家坦克对象
-	
+
 	private ArrayList<Tank> tankList = new ArrayList<>(); // 坦克数组
-	
+	private ArrayList<Missile> missileList = new ArrayList<>(); // 子弹数组
+	private ArrayList<Explode> explodeList = new ArrayList<>(); // 爆炸数组
+
 	/**
 	 * 绘制方法
 	 */
@@ -47,12 +51,47 @@ public class TankClient extends JFrame {
 		// 绘制坦克
 		for (int i = 0; i < tankList.size(); i++) {
 			// 如果坦克已经被击中且屏幕上没有它的子弹了，则将其删除
-			if (tankList.get(i).isLive() == false && tankList.get(i).getMissileList().size() == 0) {
+			if (!tankList.get(i).isLive()) {
 				tankList.remove(i);
 			} else {
 				tankList.get(i).draw(g);
 			}
 		}
+
+		// 绘制所有子弹
+		for (int i = 0; i < missileList.size(); i++) {
+			if (!missileList.get(i).isLive()) {
+				missileList.remove(i);
+			} else {
+				Missile missile = missileList.get(i);
+				missile.draw(g);
+				// 遍历所有敌方坦克看是否击中
+				for (Tank tank : tankList) {
+					// 自己方的子弹不能击中自己人
+					if (tank.isGood() != missile.isGood()) {
+						missile.hitTank(tank);
+					}
+				}
+			}
+		}
+
+		// 绘制所有爆炸
+		for (int i = 0; i < explodeList.size(); i++) {
+			if (!explodeList.get(i).isLive()) {
+				explodeList.remove(i);
+			} else {
+				Explode explode = explodeList.get(i);
+				explode.draw(g);
+			}
+		}
+
+		// 绘制debug文字
+		c = g.getColor();
+		g.setColor(Color.BLACK);
+		g.drawString("Missile count: " + missileList.size(), 10, 50);
+		g.drawString("Explode count: " + explodeList.size(), 10, 80);
+		g.drawString("Tank count: " + tankList.size(), 10, 110);
+		g.setColor(c);
 	}
 
 	/**
@@ -95,11 +134,18 @@ public class TankClient extends JFrame {
 		this.setResizable(false);
 		// 设置窗口是否可见
 		this.setVisible(true);
-		
-		Tank enemyTank = new Tank(200, 200, false, this); // 实例化一个敌方坦克
-		this.tankList.add(enemyTank);
+
+		// 将玩家Tank添加到Tank列表中
 		this.tankList.add(playerTank);
-		
+		// 增加多量敌方Tank
+		int enemyTankNum = (int) (Math.random() * 10 + 1);
+		for (int i = 0; i < enemyTankNum; i++) {
+			Tank tank = new Tank((int) (Math.random() * (GAME_WIDTH - Tank.TANK_WIDTH * 2) + Tank.TANK_WIDTH),
+								 (int) (Math.random() * (GAME_HEIGHT - Tank.TANK_HEIGHT * 2) + Tank.TANK_HEIGHT)
+								 , false, this);
+			this.tankList.add(tank);
+		}
+
 		// 添加键盘监听器
 		this.addKeyListener(new KeyMonitor());
 
@@ -154,7 +200,6 @@ public class TankClient extends JFrame {
 		}
 	}
 
-	
 	public ArrayList<Tank> getTankList() {
 		return tankList;
 	}
@@ -163,4 +208,19 @@ public class TankClient extends JFrame {
 		this.tankList = tankList;
 	}
 
+	public ArrayList<Missile> getMissileList() {
+		return missileList;
+	}
+
+	public void setMissileList(ArrayList<Missile> missileList) {
+		this.missileList = missileList;
+	}
+
+	public ArrayList<Explode> getExplodeList() {
+		return explodeList;
+	}
+
+	public void setExplodeList(ArrayList<Explode> explodeList) {
+		this.explodeList = explodeList;
+	}
 }
