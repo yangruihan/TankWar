@@ -14,7 +14,7 @@ import com.yrh.run.TankClient;
  *
  */
 public class Missile {
-	public static final int DEFAULT_SPEED = 5; // 子弹默认速度
+	public static final int DEFAULT_SPEED = 5; // 子弹默认速度 默认为5
 	public static final int MISSILE_WIDTH = 10; // 子弹默认宽度
 	public static final int MISSILE_HEIGHT = 10; // 子弹默认高度
 	
