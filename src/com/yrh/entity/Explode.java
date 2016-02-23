@@ -14,7 +14,7 @@ import com.yrh.run.TankClient;
 public class Explode {
 
 	public static Color EXPLODE_COLOR = Color.ORANGE; // 默认爆炸颜色
-	public static int INTERVAL_TIME = 80; // 默认爆炸范围更改间隔时间
+	public static int INTERVAL_TIME = 30; // 默认爆炸范围更改间隔时间
 
 	private int x; // 爆炸的X坐标
 	private int y; // 爆炸的Y坐标
@@ -23,14 +23,14 @@ public class Explode {
 
 	private TankClient tc; // 坦克客户端引用
 
-	private int[] diameter = { 3, 9, 17, 25, 34, 49, 28, 12, 2 }; // 直径的变化
+	private int[] diameter = { 3, 9, 17, 25, 34, 49, 68, 90, 40, 28, 12, 2 }; // 直径的变化
 	private int step = 0; // 记录直径变化到哪一步
 
 	public Explode(int x, int y, TankClient tc) {
 		this.x = x;
 		this.y = y;
 		this.tc = tc;
-		
+
 		new Thread(new ExplodeThread()).start();
 	}
 

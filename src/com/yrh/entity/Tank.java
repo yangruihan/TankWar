@@ -46,9 +46,6 @@ public class Tank {
 	private boolean canFire = true;
 	private int fireSpeed = 1; // 开火速度，默认为1
 
-	// 用数组记录Tank发出的子弹
-	private ArrayList<Missile> missileList = new ArrayList<>();
-
 	public Tank(TankClient tc) {
 		this(50, 50, DEFAULT_SPEED, DEFAULT_SPEED, true, tc);
 	}
@@ -96,32 +93,11 @@ public class Tank {
 	 *            画笔
 	 */
 	public void draw(Graphics g) {
-		// 绘制所有子弹
-		for (int i = 0; i < missileList.size(); i++) {
-			if (missileList.get(i).isLive() == false) {
-				missileList.remove(i);
-			} else {
-				missileList.get(i).draw(g);
-				// 遍历所有敌方坦克看是否击中
-				for (Tank tank : tc.getTankList()) {
-					// 自己的子弹不能击中自己
-					if (tank != this) {
-						missileList.get(i).hitTank(tank);
-					}
-				}
-			}
-		}
-		
 		// 如果已经没有生命了，直接return
 		if (!live) {
 			return;
 		}
 		
-		// 发射炮弹
-		if (bFire) {
-			fire();
-		}
-
 		// 保存当前颜色
 		Color c = g.getColor();
 		// 根据敌我标记设置颜色并画圆
@@ -139,6 +115,11 @@ public class Tank {
 
 		// 移动坦克
 		move();
+		
+		// 发射炮弹
+		if (bFire) {
+			fire();
+		}
 	}
 
 	/**
@@ -295,8 +276,8 @@ public class Tank {
 	private void fire() {
 		if (canFire) {
 			Missile missile = new Missile(x + TANK_WIDTH / 2 - Missile.MISSILE_WIDTH / 2,
-					y + TANK_WIDTH / 2 - Missile.MISSILE_HEIGHT / 2, gunBarrelDirection);
-			missileList.add(missile);
+					y + TANK_WIDTH / 2 - Missile.MISSILE_HEIGHT / 2, gunBarrelDirection, tc, good);
+			tc.getMissileList().add(missile);
 			// 创建一个设置开火间隔的进程
 			new Thread(new FireThread()).start();
 		}
@@ -410,7 +391,11 @@ public class Tank {
 		this.live = live;
 	}
 
-	public ArrayList<Missile> getMissileList() {
-		return missileList;
+	public boolean isGood() {
+		return good;
+	}
+
+	public void setGood(boolean good) {
+		this.good = good;
 	}
 }

@@ -26,14 +26,18 @@ public class Missile {
 	
 	private boolean live = true; // 子弹是否存活
 	
+	private boolean good = true; // 用于区分敌我的值 true 我方 false 敌方
+	
+	private TankClient tc; // 坦克客户端引用
+	
 	/**
 	 * 三个参数构造方法
 	 * @param x 子弹 x 坐标
 	 * @param y 子弹 y 坐标
 	 * @param direction 子弹运动方向
 	 */
-	public Missile(int x, int y, Direction direction) {
-		this(x, y, DEFAULT_SPEED, DEFAULT_SPEED, direction);
+	public Missile(int x, int y, Direction direction, TankClient tc, boolean good) {
+		this(x, y, DEFAULT_SPEED, DEFAULT_SPEED, direction, tc, good);
 	}
 
 	/**
@@ -44,13 +48,14 @@ public class Missile {
 	 * @param ySpeed 子弹y轴速度
 	 * @param direction 子弹运动方向
 	 */
-	public Missile(int x, int y, int xSpeed, int ySpeed, Direction direction) {
-		super();
+	public Missile(int x, int y, int xSpeed, int ySpeed, Direction direction, TankClient tc, boolean good) {
 		this.x = x;
 		this.y = y;
 		this.xSpeed = xSpeed;
 		this.ySpeed = ySpeed;
 		this.direction = direction;
+		this.tc = tc;
+		this.good = good;
 	}
 
 	/**
@@ -116,6 +121,9 @@ public class Missile {
 			// 设置子弹和坦克的死亡
 			this.live = false;
 			tank.setLive(false);
+			// 新建一个爆炸实例
+			Explode explode = new Explode(x, y, tc);
+			tc.getExplodeList().add(explode);
 			return true;
 		}
 		return false;
@@ -173,5 +181,13 @@ public class Missile {
 
 	public boolean isLive() {
 		return live;
+	}
+
+	public boolean isGood() {
+		return good;
+	}
+
+	public void setGood(boolean good) {
+		this.good = good;
 	}
 }
